@@ -1,15 +1,17 @@
-use starlark::environment::{GlobalsBuilder, Module, LibraryExtension};
+use crate::toolchain::{
+    CargoBuildProvider, ChainProvider, HostProvider, ToolProvider, UrlProvider,
+};
+use anyhow::Result;
+use starlark::environment::{GlobalsBuilder, LibraryExtension, Module};
 use starlark::eval::Evaluator;
+use starlark::starlark_module;
 use starlark::syntax::{AstModule, Dialect};
-use starlark::values::none::NoneType;
 use starlark::values::Value;
 use starlark::values::list::ListRef;
-use starlark::starlark_module;
+use starlark::values::none::NoneType;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use anyhow::Result;
-use crate::toolchain::{ToolProvider, UrlProvider, HostProvider, CargoBuildProvider, ChainProvider};
 
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
@@ -33,13 +35,14 @@ thread_local! {
 
 #[starlark_module]
 fn bu_globals(builder: &mut GlobalsBuilder) {
-    fn register_tool(name: String, 
-                     version: String, 
-                     url_template: Option<String>, 
-                     sha256: Option<String>,
-                     git_url: Option<String>,
-                     strategies: Option<Value>) -> anyhow::Result<NoneType> {
-        
+    fn register_tool(
+        name: String,
+        version: String,
+        url_template: Option<String>,
+        sha256: Option<String>,
+        git_url: Option<String>,
+        strategies: Option<Value>,
+    ) -> anyhow::Result<NoneType> {
         let strategies_vec = if let Some(v) = strategies {
             if let Some(list) = ListRef::from_value(v) {
                 list.iter().map(|item| item.to_str()).collect()
@@ -47,7 +50,7 @@ fn bu_globals(builder: &mut GlobalsBuilder) {
                 return Err(anyhow::anyhow!("strategies must be a list of strings"));
             }
         } else {
-             vec!["host".into(), "url".into()]
+            vec!["host".into(), "url".into()]
         };
 
         CONFIG_CAPTURE.with(|capture| {
@@ -63,14 +66,14 @@ fn bu_globals(builder: &mut GlobalsBuilder) {
                 config_rc.borrow_mut().tools.insert(name, def);
             }
         });
-        
+
         Ok(NoneType)
     }
 }
 
 pub fn load_config(content: &str) -> Result<Config> {
     let config = Rc::new(RefCell::new(Config::default()));
-    
+
     // Set thread local
     CONFIG_CAPTURE.with(|capture| {
         *capture.borrow_mut() = Some(config.clone());
@@ -79,23 +82,24 @@ pub fn load_config(content: &str) -> Result<Config> {
     // Use extended globals which includes 'struct' (StructType)
     let mut globals = GlobalsBuilder::extended_by(&[LibraryExtension::StructType]);
     bu_globals(&mut globals); // This calls the generated function
-    
+
     let module = Module::new();
     let globals = globals.build();
     let mut evaluator = Evaluator::new(&module);
-    
+
     // Preamble to alias
     let preamble = "bu = struct(register_tool = register_tool)";
     let preamble_ast = AstModule::parse("preamble.star", preamble.to_owned(), &Dialect::Standard)
         .map_err(|e| anyhow::anyhow!("{}", e))?;
-    
-    evaluator.eval_module(preamble_ast, &globals)
+
+    evaluator
+        .eval_module(preamble_ast, &globals)
         .map_err(|e| anyhow::anyhow!("Preamble error: {}", e))?;
 
     // User content
     let ast = AstModule::parse("config.star", content.to_owned(), &Dialect::Standard)
         .map_err(|e| anyhow::anyhow!("{}", e))?;
-        
+
     let res = evaluator.eval_module(ast, &globals);
 
     // Clear thread local
@@ -112,9 +116,9 @@ pub fn load_config(content: &str) -> Result<Config> {
 impl Config {
     pub fn get_tool_provider(&self, tool_name: &str) -> Option<Box<dyn ToolProvider>> {
         let def = self.tools.get(tool_name)?;
-        
+
         let mut providers: Vec<Box<dyn ToolProvider>> = Vec::new();
-        
+
         for strategy in &def.strategies {
             match strategy.as_str() {
                 "host" => providers.push(Box::new(HostProvider)),
@@ -137,7 +141,7 @@ impl Config {
                 _ => {}
             }
         }
-        
+
         Some(Box::new(ChainProvider::new(providers)))
     }
 }
@@ -158,7 +162,7 @@ bu.register_tool(
 "#;
         let config = load_config(content).unwrap();
         assert!(config.tools.contains_key("buck2"));
-        
+
         let def = config.tools.get("buck2").unwrap();
         assert_eq!(def.version, "2024-01-01");
         assert_eq!(def.strategies, vec!["url", "host"]);

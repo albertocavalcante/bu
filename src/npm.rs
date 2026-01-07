@@ -74,7 +74,10 @@ mod tests {
         writeln!(node_version_file, "20.10.0").unwrap();
 
         let version = get_node_version(dir.path()).unwrap();
-        assert_eq!(version, "18.17.0", ".nvmrc should be preferred over .node-version");
+        assert_eq!(
+            version, "18.17.0",
+            ".nvmrc should be preferred over .node-version"
+        );
     }
 
     #[test]
@@ -107,7 +110,10 @@ mod tests {
         writeln!(file, "  v18.17.0  ").unwrap();
 
         let version = get_node_version(dir.path()).unwrap();
-        assert_eq!(version, "18.17.0", "whitespace should be trimmed and v prefix removed");
+        assert_eq!(
+            version, "18.17.0",
+            "whitespace should be trimmed and v prefix removed"
+        );
     }
 
     #[test]
@@ -115,7 +121,10 @@ mod tests {
         let dir = tempdir().unwrap();
 
         let version = get_node_version(dir.path()).unwrap();
-        assert_eq!(version, "latest", "should default to 'latest' when no version files exist");
+        assert_eq!(
+            version, "latest",
+            "should default to 'latest' when no version files exist"
+        );
     }
 
     #[test]
@@ -126,6 +135,9 @@ mod tests {
         writeln!(file, "v20.10.0").unwrap();
 
         let version = get_node_version(dir.path()).unwrap();
-        assert_eq!(version, "20.10.0", "v prefix should be removed from .node-version");
+        assert_eq!(
+            version, "20.10.0",
+            "v prefix should be removed from .node-version"
+        );
     }
 }

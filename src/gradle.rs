@@ -65,7 +65,11 @@ mod tests {
         let mut file = File::create(wrapper_dir.join("gradle-wrapper.properties")).unwrap();
         writeln!(file, "distributionBase=GRADLE_USER_HOME").unwrap();
         writeln!(file, "distributionPath=wrapper/dists").unwrap();
-        writeln!(file, "distributionUrl=https\\://services.gradle.org/distributions/gradle-8.5-bin.zip").unwrap();
+        writeln!(
+            file,
+            "distributionUrl=https\\://services.gradle.org/distributions/gradle-8.5-bin.zip"
+        )
+        .unwrap();
         writeln!(file, "zipStoreBase=GRADLE_USER_HOME").unwrap();
         writeln!(file, "zipStorePath=wrapper/dists").unwrap();
 
@@ -81,7 +85,11 @@ mod tests {
 
         let mut file = File::create(wrapper_dir.join("gradle-wrapper.properties")).unwrap();
         writeln!(file, "distributionBase=GRADLE_USER_HOME").unwrap();
-        writeln!(file, "distributionUrl=https\\://services.gradle.org/distributions/gradle-7.6.1-all.zip").unwrap();
+        writeln!(
+            file,
+            "distributionUrl=https\\://services.gradle.org/distributions/gradle-7.6.1-all.zip"
+        )
+        .unwrap();
         writeln!(file, "zipStoreBase=GRADLE_USER_HOME").unwrap();
 
         let version = get_gradle_version(dir.path()).unwrap();
@@ -95,7 +103,11 @@ mod tests {
         fs::create_dir_all(&wrapper_dir).unwrap();
 
         let mut file = File::create(wrapper_dir.join("gradle-wrapper.properties")).unwrap();
-        writeln!(file, "distributionUrl=https://services.gradle.org/distributions/gradle-8.0-bin.zip").unwrap();
+        writeln!(
+            file,
+            "distributionUrl=https://services.gradle.org/distributions/gradle-8.0-bin.zip"
+        )
+        .unwrap();
 
         let version = get_gradle_version(dir.path()).unwrap();
         assert_eq!(version, "8.0");
@@ -141,7 +153,9 @@ mod tests {
     #[test]
     fn test_extract_version_from_url_bin() {
         assert_eq!(
-            extract_version_from_url("https://services.gradle.org/distributions/gradle-8.5-bin.zip"),
+            extract_version_from_url(
+                "https://services.gradle.org/distributions/gradle-8.5-bin.zip"
+            ),
             Some("8.5".to_string())
         );
     }
@@ -149,7 +163,9 @@ mod tests {
     #[test]
     fn test_extract_version_from_url_all() {
         assert_eq!(
-            extract_version_from_url("https://services.gradle.org/distributions/gradle-7.6.1-all.zip"),
+            extract_version_from_url(
+                "https://services.gradle.org/distributions/gradle-7.6.1-all.zip"
+            ),
             Some("7.6.1".to_string())
         );
     }
@@ -157,7 +173,9 @@ mod tests {
     #[test]
     fn test_extract_version_from_url_escaped() {
         assert_eq!(
-            extract_version_from_url("https\\://services.gradle.org/distributions/gradle-8.0-bin.zip"),
+            extract_version_from_url(
+                "https\\://services.gradle.org/distributions/gradle-8.0-bin.zip"
+            ),
             Some("8.0".to_string())
         );
     }
@@ -174,7 +192,11 @@ mod tests {
         fs::create_dir_all(&wrapper_dir).unwrap();
 
         let mut file = File::create(wrapper_dir.join("gradle-wrapper.properties")).unwrap();
-        writeln!(file, "  distributionUrl = https://services.gradle.org/distributions/gradle-8.5-bin.zip  ").unwrap();
+        writeln!(
+            file,
+            "  distributionUrl = https://services.gradle.org/distributions/gradle-8.5-bin.zip  "
+        )
+        .unwrap();
 
         let version = get_gradle_version(dir.path()).unwrap();
         assert_eq!(version, "8.5");

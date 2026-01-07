@@ -22,7 +22,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result};
 use clap::{CommandFactory, Parser, Subcommand};
-use clap_complete::{generate, Shell};
+use clap_complete::{Shell, generate};
 use tracing::{debug, info, warn};
 
 use detector::ProjectType;
@@ -35,7 +35,8 @@ use detector::ProjectType;
 #[command(name = "bu")]
 #[command(version)]
 #[command(about = "A smart build tool wrapper")]
-#[command(long_about = "A universal build tool wrapper that automatically detects your project type \
+#[command(
+    long_about = "A universal build tool wrapper that automatically detects your project type \
 and runs the appropriate build tool with zero configuration.
 
 Examples:
@@ -45,7 +46,8 @@ Examples:
   bu config                   Show effective configuration
   bu cache list               List cached tools
   bu cache clean              Clear all cached tools
-  bu completions bash         Generate bash completions")]
+  bu completions bash         Generate bash completions"
+)]
 struct Cli {
     /// Run in offline mode (don't download tools)
     #[arg(long)]
@@ -154,7 +156,12 @@ fn resolve_tool(offline: bool) -> Result<ToolResolution> {
 
     let tool_path = provider
         .provide(tool_name, &version, &tool_context)
-        .with_context(|| format!("Failed to provide tool '{}' version '{}'", tool_name, version))?;
+        .with_context(|| {
+            format!(
+                "Failed to provide tool '{}' version '{}'",
+                tool_name, version
+            )
+        })?;
 
     info!("Resolved tool path: {:?}", tool_path);
 
