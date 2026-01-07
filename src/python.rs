@@ -41,18 +41,18 @@ fn extract_requires_python(content: &str) -> Option<String> {
         let line = line.trim();
         if line.starts_with("requires-python") {
             // Extract value between quotes
-            if let Some(start) = line.find('"') {
-                if let Some(end) = line[start + 1..].find('"') {
-                    let version_spec = &line[start + 1..start + 1 + end];
-                    // Clean up version specifier (remove >=, ~=, etc.)
-                    return Some(clean_version_spec(version_spec));
-                }
+            if let Some(start) = line.find('"')
+                && let Some(end) = line[start + 1..].find('"')
+            {
+                let version_spec = &line[start + 1..start + 1 + end];
+                // Clean up version specifier (remove >=, ~=, etc.)
+                return Some(clean_version_spec(version_spec));
             }
-            if let Some(start) = line.find('\'') {
-                if let Some(end) = line[start + 1..].find('\'') {
-                    let version_spec = &line[start + 1..start + 1 + end];
-                    return Some(clean_version_spec(version_spec));
-                }
+            if let Some(start) = line.find('\'')
+                && let Some(end) = line[start + 1..].find('\'')
+            {
+                let version_spec = &line[start + 1..start + 1 + end];
+                return Some(clean_version_spec(version_spec));
             }
         }
     }

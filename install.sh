@@ -3,14 +3,14 @@
 # To make executable: chmod +x install.sh
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/anthropics/bu/main/cli-impl/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/albertocavalcante/bu/main/cli-impl/install.sh | sh
 #   or
 #   ./install.sh --install-dir /usr/local/bin
 
 set -e
 
 # Configuration
-REPO="${BU_REPO:-anthropics/bu}"
+REPO="${BU_REPO:-albertocavalcante/bu}"
 INSTALL_DIR="${BU_INSTALL_DIR:-$HOME/.bu/bin}"
 BINARY_NAME="bu"
 
@@ -61,12 +61,12 @@ Options:
     --repo OWNER/REPO       Use different GitHub repository
 
 Environment variables:
-    BU_REPO         GitHub repository (default: anthropics/bu)
+    BU_REPO         GitHub repository (default: albertocavalcante/bu)
     BU_INSTALL_DIR  Installation directory (default: ~/.bu/bin)
 
 Examples:
     # Install latest version
-    curl -fsSL https://raw.githubusercontent.com/anthropics/bu/main/cli-impl/install.sh | sh
+    curl -fsSL https://raw.githubusercontent.com/albertocavalcante/bu/main/cli-impl/install.sh | sh
 
     # Install specific version
     ./install.sh --version v1.0.0
