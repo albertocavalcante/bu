@@ -6,10 +6,13 @@
 mod bazel;
 mod buck2;
 mod config;
+mod deno;
 mod detector;
+mod dotnet;
 mod gradle;
 mod maven;
 mod npm;
+mod python;
 mod tool_cache;
 mod toolchain;
 
@@ -115,8 +118,15 @@ fn resolve_tool(offline: bool) -> Result<ToolResolution> {
     let project_type = detector::detect_project_type(&cwd);
     if !project_type.is_known() {
         anyhow::bail!(
-            "Could not detect project type in {:?}. \
-            Supported: Buck2, Bazel, Cargo, Maven, Gradle, npm, pnpm, Yarn, Go, Make",
+            "Could not detect project type in {:?}.\n\n\
+            Supported build tools:\n  \
+            Monorepo: Buck2, Bazel\n  \
+            Systems:  Cargo, Go, Zig\n  \
+            JVM:      Maven, Gradle\n  \
+            JS/TS:    npm, pnpm, Yarn, Bun, Deno\n  \
+            Python:   uv, Poetry, pip\n  \
+            Other:    .NET, Swift, Bundler, Mix, Composer\n  \
+            Tasks:    Make, Just, CMake",
             cwd
         );
     }
