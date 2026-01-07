@@ -14,14 +14,14 @@ pub fn get_gradle_version(path: &Path) -> io::Result<String> {
     // Parse the distributionUrl property
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with("distributionUrl") {
-            if let Some(url) = line.split('=').nth(1) {
-                // Extract version from URL like:
-                // https://services.gradle.org/distributions/gradle-8.5-bin.zip
-                // or https://services.gradle.org/distributions/gradle-8.5-all.zip
-                if let Some(version) = extract_version_from_url(url.trim()) {
-                    return Ok(version);
-                }
+        if line.starts_with("distributionUrl")
+            && let Some(url) = line.split('=').nth(1)
+        {
+            // Extract version from URL like:
+            // https://services.gradle.org/distributions/gradle-8.5-bin.zip
+            // or https://services.gradle.org/distributions/gradle-8.5-all.zip
+            if let Some(version) = extract_version_from_url(url.trim()) {
+                return Ok(version);
             }
         }
     }

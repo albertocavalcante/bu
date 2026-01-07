@@ -21,6 +21,10 @@ impl ToolCache {
         ToolCache { base_dir }
     }
 
+    pub fn cache_dir(&self) -> &Path {
+        &self.base_dir
+    }
+
     pub fn get_tool_path(&self, tool_name: &str, version: &str) -> PathBuf {
         let mut path = self.base_dir.join(tool_name).join(version).join(tool_name);
 
